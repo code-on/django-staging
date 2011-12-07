@@ -17,8 +17,8 @@ Add `'staging'` to your `INSTALLED_APPS` and this to `settings.py`:
 
 `save_staging` command saves data from your database to fixtures:
 
-    $ ./manage.py save_staging auth
-    $ ./manage.py save_staging auth.User
+    $ ./manage.py save_staging auth main
+    $ ./manage.py save_staging auth.User main
 
 Fixtures are saved in `fixtures` folder of your project's application or in 'fixtures' folder in your project, with prefix `'staging_'`. All files from FileField or ImageField are saved in MEDIA_ROOT+'staging' folder, so you should not worry that files' urls are broken.
 
