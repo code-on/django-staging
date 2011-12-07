@@ -3,8 +3,7 @@ from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db.transaction import commit_on_success
 from django.db.models.loading import get_apps
-from django.conf import settings
-
+from staging.signals import on_load_staging
 
 class Command(BaseCommand):
 
@@ -24,13 +23,13 @@ class Command(BaseCommand):
                 app_module_paths.append(app.__file__)
 
         app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
-        #print '\n'.join(app_fixtures)
-        app_fixtures += settings.FIXTURE_DIRS
-
         for app in app_fixtures:
             if os.path.exists(app):
                 self.load_path(app, options)
+        
+        on_load_staging.send(app_fixtures)
 
+    
     def load_path(self, path, options):
         fixtures = sorted([i for i in os.listdir(path) if i.startswith('staging_')])
         for fx in fixtures:
