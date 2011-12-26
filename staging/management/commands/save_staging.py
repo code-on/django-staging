@@ -55,6 +55,8 @@ class Command(BaseCommand):
             if isinstance(field, FileField):
                 for obj in model._default_manager.all():
                     file = getattr(obj, field.name)
+                    if not file:
+                        continue
                     name = file.path.split('/')[-1]
                     dir_path = os.path.join(STAGING_MEDIA_ROOT, app_label, model_name)
                     if not os.path.exists(dir_path):
