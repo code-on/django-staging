@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db.models.loading import get_apps
 from django.db.transaction import commit_on_success
 from optparse import make_option
+from staging.signals import on_load_staging
 import os
 
 
@@ -38,14 +39,15 @@ class Command(BaseCommand):
             if os.path.exists(app):
                 self.load_path(app, options, env)
 
+        on_load_staging.send(app_fixtures)
+
     def load_path(self, path, options, env):
         prefix = 'staging_'
+        fixtures = sorted([i for i in os.listdir(path) if i.startswith(prefix)])
+
         if env:
             env_prefix = env + '_' + prefix
-            fixtures = sorted([i for i in os.listdir(path) if i.startswith(prefix)])
             fixtures.extend(sorted([i for i in os.listdir(path) if i.startswith(env_prefix)]))
-        else:
-            fixtures = sorted([i for i in os.listdir(path) if i.startswith(prefix)])
 
         for fx in fixtures:
             call_command('loaddata', fx, **options)
