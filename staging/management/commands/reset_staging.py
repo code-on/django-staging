@@ -6,7 +6,7 @@ import os
 
 
 class Command(BaseCommand):
-
+    requires_model_validation = True
     option_list = BaseCommand.option_list + (
         make_option('--env', '-e', dest='env',
             help='enviroment'),
