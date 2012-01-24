@@ -12,7 +12,7 @@ class Command(BaseCommand):
             help='enviroment'),
     )
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
         for db_key in settings.DATABASES.keys():
             db_file = settings.DATABASES[db_key]['NAME']
             if os.path.exists(db_file):
@@ -24,4 +24,4 @@ class Command(BaseCommand):
                 kwargs['migrate_all'] = True
 
             call_command('syncdb', **kwargs)
-        call_command('load_staging', env=kwargs.get('env'))
+        call_command('load_staging', env=options.get('env'))

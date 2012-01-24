@@ -30,6 +30,10 @@ Fixtures are saved in `fixtures` folder of your project's application or in 'fix
 
     $ ./manage.py reset_staging
 
+# Fixtures prefix
+
+You can use option `--env` to save and load fixtures for some enviroment. `load_staging` load at first all staging fixtures, then fixtures saved with same `--env` option.
+
 # Configuration
 
 `STAGING_MEDIA_PATH` - folder in `MEDIA_ROOT` where files are saved. Default value is 'staging'.

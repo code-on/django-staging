@@ -22,8 +22,8 @@ class Command(BaseCommand):
                 for field in opt.fields:
                     self.fill_field(obj, field, model)
                 obj.save()
+                #obj = model.objects.get(pk=obj.pk)
+                #print obj.title
 
     def fill_field(self, obj, field, model):
-        value = get_generator(field, model).get()
-        setattr(obj, field.attname, value)
-        #print field.attname, '=>', value
+        get_generator(field, model).set_value(obj)
