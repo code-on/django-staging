@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError
 from django.db.models import FileField, get_app, get_models, get_model
 from optparse import make_option
@@ -34,7 +35,10 @@ class Command(BaseCommand):
                 app_label, model_label = app_label.split('.')
                 models = [get_model(app_label, model_label)]
             except ValueError:
-                app = get_app(app_label)
+                try:
+                    app = get_app(app_label)
+                except ImproperlyConfigured, e:
+                    raise CommandError(e)
                 models = get_models(app)
 
             for model in models:
@@ -54,7 +58,7 @@ class Command(BaseCommand):
                 fixtures_path = '%s/%sstaging_%s.json' % (fixtures_dir, env_prefix, meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
-                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=1'],
+                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=1', '--natural'],
                     stdout=open(fixtures_path, 'w'))
 
     def move_files(self, model):
