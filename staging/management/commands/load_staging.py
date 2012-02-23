@@ -21,6 +21,10 @@ class Command(BaseCommand):
 
     @commit_on_success
     def handle(self, *args, **kwargs):
+        if settings.DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
+            if raw_input('Database engine is not SQLite. Do you wish load staging data? [y/N]') != 'y':
+                return
+
         env = kwargs.get('env')
         options = kwargs.get('options', {})
         app_module_paths = []

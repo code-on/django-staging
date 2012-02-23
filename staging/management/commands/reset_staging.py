@@ -14,6 +14,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for db_key in settings.DATABASES.keys():
+            if settings.DATABASES[db_key]['ENGINE'] != 'django.db.backends.sqlite3':
+                if raw_input('Database engine is not SQLite. Do you wish run reset? [y/N]') != 'y':
+                    continue
             db_file = settings.DATABASES[db_key]['NAME']
             if os.path.exists(db_file):
                 if not 'nodelete' in args:
