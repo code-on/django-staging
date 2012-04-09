@@ -67,7 +67,7 @@ class Command(BaseCommand):
         model_name = meta.object_name.lower()
 
         for field in meta.fields:
-            if isinstance(field, FileField):
+            if isinstance(field, FileField) and field in meta.local_fields:
                 for obj in model._default_manager.all():
                     file = getattr(obj, field.name)
                     if not file:
