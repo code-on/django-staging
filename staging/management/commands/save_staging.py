@@ -83,7 +83,7 @@ class Command(BaseCommand):
                             name = '_' + name
                             new_path = os.path.abspath(os.path.join(dir_path, name))
 
-                        value = new_path[len(settings.MEDIA_ROOT):]
+                        value = new_path[len(os.path.normpath(settings.MEDIA_ROOT)):]
                         if value.startswith('/'):
                             value = value[1:]
 
