@@ -87,6 +87,10 @@ class Command(BaseCommand):
                         if value.startswith('/'):
                             value = value[1:]
 
-                        shutil.move(file.path, new_path)
+                        try:
+                            shutil.move(file.path, new_path)
+                        except IOError:
+                            pass
+
                         setattr(obj, field.name, value)
                         obj.save()
