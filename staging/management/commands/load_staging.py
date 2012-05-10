@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db.models.loading import get_apps
-from django.db.transaction import commit_on_success
 from optparse import make_option
 from staging.signals import on_load_staging
 import os
@@ -19,7 +18,6 @@ class Command(BaseCommand):
             help='enviroment'),
     )
 
-    @commit_on_success
     def handle(self, *args, **kwargs):
         if settings.DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
             if raw_input('Database engine is not SQLite. Do you wish load staging data? [y/N]') != 'y':
@@ -27,6 +25,7 @@ class Command(BaseCommand):
 
         env = kwargs.get('env')
         options = kwargs.get('options', {})
+
         app_module_paths = []
         for app in get_apps():
             if hasattr(app, '__path__'):
@@ -40,9 +39,13 @@ class Command(BaseCommand):
         app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
         app_fixtures += settings.FIXTURE_DIRS
 
+        fixtures = []
+
         for app in app_fixtures:
             if os.path.exists(app):
-                self.load_path(app, options, env)
+                fixtures.extend(self.load_path(app, options, env))
+
+        call_command('loaddata', *fixtures, **options)
 
         on_load_staging.send(app_fixtures)
 
@@ -54,5 +57,4 @@ class Command(BaseCommand):
             env_prefix = env + '_' + prefix
             fixtures.extend(sorted([i for i in os.listdir(path) if i.startswith(env_prefix)]))
 
-        for fx in fixtures:
-            call_command('loaddata', fx, **options)
+        return fixtures
