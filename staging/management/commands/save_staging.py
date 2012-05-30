@@ -55,7 +55,8 @@ class Command(BaseCommand):
                 if not os.path.exists(fixtures_dir):
                     os.makedirs(fixtures_dir)
 
-                fixtures_path = '%s/%sstaging_%s.json' % (fixtures_dir, env_prefix, meta.object_name.lower())
+                fixtures_path = '%s/%sstaging_%s_%s.json' % (fixtures_dir, env_prefix, \
+                    meta.app_label.lower(), meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
                 subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=1', '--natural'],
