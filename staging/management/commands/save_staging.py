@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     meta.app_label.lower(), meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
-                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=1', '--natural'],
+                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=1'],
                     stdout=open(fixtures_path, 'w'))
 
     def move_files(self, model):
