@@ -27,4 +27,8 @@ class Command(BaseCommand):
                 kwargs['migrate_all'] = True
 
             call_command('syncdb', **kwargs)
+
+            if kwargs.get('migrate_all'):
+                call_command('migrate', fake=True)
+
         call_command('load_staging', env=options.get('env'))
