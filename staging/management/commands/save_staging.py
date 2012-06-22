@@ -3,7 +3,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError
 from django.db.models import FileField, get_app, get_models, get_model
 from optparse import make_option
-from settings import rel
 import os
 import shutil
 import subprocess
@@ -25,6 +24,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, *app_labels, **options):
+        if not settings.FIXTURE_DIRS:
+            raise CommandError('Add fixtures folder for project root to FIXTURE_DIRS for saving apps not from project')
+
         if options.get('env'):
             env_prefix = options.get('env') + '_'
         else:
@@ -41,19 +43,13 @@ class Command(BaseCommand):
                     raise CommandError(e)
                 models = get_models(app)
 
+            fixtures_dir = settings.FIXTURE_DIRS[0]
+            if not os.path.exists(fixtures_dir):
+                os.makedirs(fixtures_dir)
+
             for model in models:
                 meta = model._meta
                 model_name = '%s.%s' % (meta.app_label, meta.object_name)
-                app_dir = rel(meta.app_label)
-
-                if not os.path.exists(app_dir):
-                    app_dir = rel('')
-                    if not ('%sfixtures' % app_dir) in settings.FIXTURE_DIRS:
-                        raise CommandError('Add fixtures folder for project root to FIXTURE_DIRS for saving apps not from project')
-
-                fixtures_dir = '%s/fixtures' % app_dir
-                if not os.path.exists(fixtures_dir):
-                    os.makedirs(fixtures_dir)
 
                 fixtures_path = '%s/%sstaging_%s_%s.json' % (fixtures_dir, env_prefix, \
                     meta.app_label.lower(), meta.object_name.lower())
