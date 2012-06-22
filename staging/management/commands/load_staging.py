@@ -5,6 +5,7 @@ from django.db.models.loading import get_apps
 from optparse import make_option
 from staging.signals import on_load_staging
 import os
+import re
 
 
 class Command(BaseCommand):
@@ -50,11 +51,11 @@ class Command(BaseCommand):
         on_load_staging.send(app_fixtures)
 
     def load_path(self, path, options, env):
-        prefix = 'staging_'
-        fixtures = sorted([i for i in os.listdir(path) if i.startswith(prefix)])
+        fixture_pattern = re.compile(r'^staging_.+\.(json|yaml|xml)$')
+        fixtures = sorted([i for i in os.listdir(path) if fixture_pattern.match(i)])
 
         if env:
-            env_prefix = env + '_' + prefix
-            fixtures.extend(sorted([i for i in os.listdir(path) if i.startswith(env_prefix)]))
+            fixture_pattern = re.compile(r'^%s_staging_.+\.(json|yaml|xml)$' % env)
+            fixtures.extend(sorted([i for i in os.listdir(path) if fixture_pattern.match(i)]))
 
         return fixtures
