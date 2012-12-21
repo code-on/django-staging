@@ -50,6 +50,9 @@ class Command(BaseCommand):
             for model in models:
                 meta = model._meta
                 model_name = '%s.%s' % (meta.app_label, meta.object_name)
+                
+                if not model.objects.exists():
+                    continue
 
                 fixtures_path = '%s/%sstaging_%s_%s.json' % (fixtures_dir, env_prefix, \
                     meta.app_label.lower(), meta.object_name.lower())
