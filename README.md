@@ -1,4 +1,4 @@
-`django-stagin` allows you to easily manage your fixtures for testing or staging server
+`django-staging` allows you to easily manage your fixtures for testing or staging server
 
 # Installation
 
@@ -37,3 +37,15 @@ You can use option `--env` to save and load fixtures for some enviroment. `load_
 # Configuration
 
 `STAGING_MEDIA_PATH` - folder in `MEDIA_ROOT` where files are saved. Default value is 'staging'.
+
+# Visual fixtures generation
+
+`staging_generator` command runs development server on 8000 port for localhost. If you access Django admin application using server started this way, you will see extra "Bulk data generation" button next to "Add object". It links to the page where you can define rules for bulk objects generation. Objects created in admin then can be saved to fixtures using `save_staging` command.
+
+Examples are below:
+
+    $ ./manage.py staging_generator
+
+![Example1](https://github.com/code-on/django-staging/raw/master/examples/example1.png)
+
+![Example2](https://github.com/code-on/django-staging/raw/master/examples/example2.png)
