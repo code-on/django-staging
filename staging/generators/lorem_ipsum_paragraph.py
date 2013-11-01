@@ -29,4 +29,4 @@ class Generator(object):
     @classmethod
     def generate(cls, min_paragraphs, max_paragraphs):
         paragraphs_count = random.randint(min_paragraphs, max_paragraphs)
-        return '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count))
+        return '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count, common=False))
