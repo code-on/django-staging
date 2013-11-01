@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=cl.app_label %}">{{ cl.app_label|capfirst|escape }}</a>
+    &rsaquo; {{ cl.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <form action="" method="post">
+        {% csrf_token %}
+        <fieldset style="padding: 10px;">
+            {{ form.non_field_errors }}
+            <table>
+                <tr>
+                    <td>{{ form.number_to_generate.label }}</td>
+                    <td>{{ form.number_to_generate }}</td>
+                </tr>
+                {% for field in form %}
+                    {% ifnotequal field.name 'number_to_generate' %}
+                        <tr>
+                            <td>{{ field.label }}</td>
+                            <td>{{ field }} {{ field.options_forms }}</td>
+                        </tr>
+                        {% if field.field.options_form %}
+                            <tr>
+                                <td colspan="2">
+                                    {{ field.field.options_form }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endifnotequal %}
+                {% endfor %}
+            </table>
+        </fieldset>
+        <button type="submit">{% trans "Generate" %}</button>
+    </form>
+  </div>
+{% endblock %}
