@@ -19,8 +19,7 @@ class Command(BaseCommand):
             u'Add --env to save fixtures for some enviroment')
 
     option_list = BaseCommand.option_list + (
-        make_option('--env', '-e', dest='env',
-            help='enviroment'),
+        make_option('--env', '-e', dest='env', help='enviroment'),
     )
 
     def handle(self, *app_labels, **options):
@@ -54,12 +53,14 @@ class Command(BaseCommand):
                 if not model.objects.exists():
                     continue
 
-                fixtures_path = '%s/%sstaging_%s_%s.json' % (fixtures_dir, env_prefix, \
-                    meta.app_label.lower(), meta.object_name.lower())
+                fixtures_path = '%s/%sstaging_%s_%s.json' % (fixtures_dir,
+                                                             env_prefix,
+                                                             meta.app_label.lower(),
+                                                             meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
                 subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=2'],
-                    stdout=open(fixtures_path, 'w'))
+                                stdout=open(fixtures_path, 'w'))
 
     def move_files(self, model):
         meta = model._meta
@@ -76,9 +77,10 @@ class Command(BaseCommand):
                     dir_path = os.path.join(STAGING_MEDIA_ROOT, app_label, model_name)
                     if not os.path.exists(dir_path):
                         os.makedirs(dir_path)
+                    old_path = file.path
                     new_path = os.path.abspath(os.path.join(dir_path, name))
 
-                    if file.path != new_path:
+                    if old_path != new_path:
                         while os.path.exists(new_path):
                             name = '_' + name
                             new_path = os.path.abspath(os.path.join(dir_path, name))
@@ -88,7 +90,7 @@ class Command(BaseCommand):
                             value = value[1:]
 
                         try:
-                            shutil.move(file.path, new_path)
+                            shutil.copy(old_path, new_path)
                         except IOError:
                             pass
 
