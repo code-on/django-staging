@@ -21,12 +21,26 @@ class Generator(object):
     slug = 'lorem-ipsum-paragraph'
     for_fields = [models.TextField]
     options_form = LoremIpsumForm
+    generated = []
+
+    def save(self, obj, field, form_data):
+        if field.unique:
+            setattr(obj, field.name, self._generate_unique(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1)))
+        else:
+            setattr(obj, field.name, self._generate(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1)))
 
     @classmethod
-    def save(cls, obj, field_name, form_data):
-        setattr(obj, field_name, cls.generate(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1)))
+    def is_available(cls, field):
+        return True
 
-    @classmethod
-    def generate(cls, min_paragraphs, max_paragraphs):
+    def _generate(self, min_paragraphs, max_paragraphs):
         paragraphs_count = random.randint(min_paragraphs, max_paragraphs)
         return '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count, common=False))
+
+    def _generate_unique(self, min_paragraphs, max_paragraphs):
+        for _ in range(10000):
+            paragraphs_count = random.randint(min_paragraphs, max_paragraphs)
+            value = '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count, common=False))
+            if value not in self.generated:
+                self.generated.append(value)
+                return value

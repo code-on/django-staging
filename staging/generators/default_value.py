@@ -1,5 +1,6 @@
 from django.db import models
 from django import forms
+from django.db.models.fields import NOT_PROVIDED
 
 
 class Generator(object):
@@ -13,6 +14,9 @@ class Generator(object):
                   models.ForeignKey, models.ManyToManyField, models.OneToOneField]
     options_form = None
 
-    @classmethod
-    def save(cls, obj, field_name, form_data):
+    def save(self, obj, field, form_data):
         pass
+
+    @classmethod
+    def is_available(cls, field):
+        return field.blank or field.default != NOT_PROVIDED

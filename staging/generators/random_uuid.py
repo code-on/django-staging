@@ -8,11 +8,24 @@ class Generator(object):
     slug = 'random-uuid'
     for_fields = [models.CharField, models.SlugField]
     options_form = None
+    generated = []
+
+    def save(self, obj, field, form_data):
+        if field.unique:
+            setattr(obj, field.name, self._generate_unique())
+        else:
+            setattr(obj, field.name, self._generate())
 
     @classmethod
-    def save(cls, obj, field_name, form_data):
-        setattr(obj, field_name, cls.generate())
+    def is_available(cls, field):
+        return True
 
-    @classmethod
-    def generate(cls):
+    def _generate(self):
         return uuid.uuid4()
+
+    def _generate_unique(self):
+        for _ in range(10000):
+            value = uuid.uuid4()
+            if value not in self.generated:
+                self.generated.append(value)
+                return value

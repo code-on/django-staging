@@ -35,13 +35,15 @@ class Generator(object):
     for_fields = [models.FileField, models.ImageField]
     options_form = RandomImageForm
 
-    @classmethod
-    def save(cls, obj, field_name, form_data):
-        name, file_ = cls.generate(form_data.get('width', 800), form_data.get('height', 600), form_data.get('theme'))
-        getattr(obj, field_name).save(name, file_, save=False)
+    def save(self, obj, field, form_data):
+        name, file_ = self._generate(form_data.get('width', 800), form_data.get('height', 600), form_data.get('theme'))
+        getattr(obj, field.name).save(name, file_, save=False)
 
     @classmethod
-    def generate(cls, width, height, theme):
+    def is_available(cls, field):
+        return True
+
+    def _generate(self, width, height, theme):
         url = 'http://lorempixel.com/%s/%s/' % (width, height)
         if theme:
             url += '%s/' % theme

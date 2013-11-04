@@ -21,16 +21,18 @@ class Generator(object):
     for_fields = [models.ManyToManyField]
     options_form = M2MForm
 
-    @classmethod
-    def save(cls, obj, field_name, form_data):
+    def save(self, obj, field, form_data):
         objects_count = random.randint(form_data.get('min_objects', 1), form_data.get('max_objects', 1))
         m2m_dict = getattr(obj, '_m2m', {})
-        m2m_dict[field_name] = []
+        m2m_dict[field.name] = []
         for x in xrange(objects_count):
-            m2m_dict[field_name].append(cls.generate(obj, field_name))
+            m2m_dict[field.name].append(self._generate(obj, field.name))
         setattr(obj, '_m2m', m2m_dict)
 
     @classmethod
-    def generate(cls, obj, field_name):
+    def is_available(cls, field):
+        return True
+
+    def _generate(self, obj, field_name):
         qs = getattr(obj.__class__, field_name).field.related.parent_model.objects.all()
         return random.choice(qs)

@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n %}
+{% load i18n staging_tags %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -14,24 +14,20 @@
     <form action="" method="post">
         {% csrf_token %}
         <fieldset style="padding: 10px;">
-            {{ form.non_field_errors }}
+            {{ main_form.non_field_errors }}
             <table>
                 <tr>
-                    <td>{{ form.number_to_generate.label }}</td>
-                    <td>{{ form.number_to_generate }}</td>
+                    <td>{{ main_form.number_to_generate.label }}</td>
+                    <td>{{ main_form.number_to_generate }}</td>
                 </tr>
-                {% for field in form %}
+                {% for field in main_form %}
                     {% ifnotequal field.name 'number_to_generate' %}
-                        <tr>
+                        <tr class="main_field" data-name="{{ field.name }}">
                             <td>{{ field.label }}</td>
-                            <td>{{ field }} {{ field.options_forms }}</td>
+                            <td>{{ field }}</td>
                         </tr>
-                        {% if field.field.options_form %}
-                            <tr>
-                                <td colspan="2">
-                                    {{ field.field.options_form }}
-                                </td>
-                            </tr>
+                        {% if extra_forms|get_form_for_field:field.name %}
+                            {{ extra_forms|get_form_for_field:field.name }}
                         {% endif %}
                     {% endifnotequal %}
                 {% endfor %}
@@ -40,4 +36,29 @@
         <button type="submit">{% trans "Generate" %}</button>
     </form>
   </div>
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript">
+        $(function(){
+            $('.main_field select').change(function(){
+                var main_field = $(this).closest('.main_field');
+                var field_name = $(this).prop('name');
+                var generator_slug = $(this).val();
+                $.ajax({
+                    url: '/admin/ajax/generate/' + field_name + '/' + generator_slug + '/',
+                    type: 'GET',
+                    success: function(data){
+                        main_field.nextAll().each(function(count, element){
+                            if ($(element).hasClass('main_field')) {
+                                return false;
+                            }
+
+                            $(element).remove();
+                        });
+                        main_field.after(data);
+                    }
+                });
+            });
+        })
+    </script>
 {% endblock %}

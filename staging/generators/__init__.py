@@ -3,6 +3,7 @@
 GENERATORS = (
     'lorem_ipsum_line',
     'lorem_ipsum_paragraph',
+    'random_choice',
     'random_object',
     'multiple_random_objects',
     'random_number',
