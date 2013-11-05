@@ -1,15 +1,15 @@
 
 
 GENERATORS = (
+    'default_value',
     'lorem_ipsum_line',
     'lorem_ipsum_paragraph',
-    'random_choice',
-    'random_object',
     'multiple_random_objects',
-    'random_number',
+    'random_choice',
     'random_email',
     'random_image',
+    'random_number',
+    'random_object',
     'random_uuid',
     'value_from_list',
-    'default_value',
 )
