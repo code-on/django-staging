@@ -2,14 +2,17 @@ import random
 from string import ascii_lowercase
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random email'
     slug = 'random-email'
     for_fields = [models.EmailField]
     options_form = None
-    generated = []
+
+    def __init__(self):
+        self.generated = []
 
     def save(self, obj, field, form_data):
         if field.unique:
@@ -26,10 +29,6 @@ class Generator(object):
             if value not in self.generated:
                 self.generated.append(value)
                 return value
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _get_name(self, length):
         return ''.join(random.choice(ascii_lowercase) for x in xrange(length))

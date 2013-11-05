@@ -4,6 +4,7 @@ from django.db import models
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 import requests
+from staging.generators import BaseGenerator
 
 
 class RandomImageForm(forms.Form):
@@ -29,7 +30,7 @@ class RandomImageForm(forms.Form):
     theme = forms.ChoiceField(choices=THEME_CHOICES, required=False)
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random image'
     slug = 'random-image'
     for_fields = [models.FileField, models.ImageField]
@@ -38,10 +39,6 @@ class Generator(object):
     def save(self, obj, field, form_data):
         name, file_ = self._generate(form_data.get('width', 800), form_data.get('height', 600), form_data.get('theme'))
         getattr(obj, field.name).save(name, file_, save=False)
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self, width, height, theme):
         url = 'http://lorempixel.com/%s/%s/' % (width, height)

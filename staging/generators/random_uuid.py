@@ -1,24 +1,23 @@
 import uuid
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random uuid'
     slug = 'random-uuid'
     for_fields = [models.CharField, models.SlugField]
     options_form = None
-    generated = []
+
+    def __init__(self):
+        self.generated = []
 
     def save(self, obj, field, form_data):
         if field.unique:
             setattr(obj, field.name, self._generate_unique())
         else:
             setattr(obj, field.name, self._generate())
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self):
         return uuid.uuid4()

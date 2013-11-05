@@ -2,6 +2,7 @@ import random
 from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
 class RandomNumberForm(forms.Form):
@@ -19,25 +20,23 @@ class NotInitialized():
     pass
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random number'
     slug = 'random-number'
     for_fields = [models.BigIntegerField, models.DecimalField, models.FloatField, models.IntegerField,
                   models.PositiveIntegerField, models.PositiveSmallIntegerField, models.SmallIntegerField]
     options_form = RandomNumberForm
-    numbers_left = NotInitialized
+
+    def __init__(self):
+        self.numbers_left = NotInitialized
 
     def save(self, obj, field, form_data):
         if field.unique:
-            if self.numbers_left_left == NotInitialized:
+            if self.numbers_left == NotInitialized:
                 self.numbers_left = range(form_data.get('min_number', 1), form_data.get('max_number', 1))
             setattr(obj, field.name, self._generate_unique())
         else:
             setattr(obj, field.name, self._generate(form_data.get('min_number', 1), form_data.get('max_number', 1)))
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self, min_number, max_number):
         return random.randint(min_number, max_number)

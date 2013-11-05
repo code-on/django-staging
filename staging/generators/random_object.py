@@ -1,18 +1,21 @@
 import random
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
 class NotInitialized():
     pass
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random object from queryset'
     slug = 'random-object'
     for_fields = [models.ForeignKey, models.OneToOneField]
     options_form = None
-    objects_left = NotInitialized
+
+    def __init__(self):
+        self.objects_left = NotInitialized
 
     def save(self, obj, field, form_data):
         if field.unique:
@@ -21,10 +24,6 @@ class Generator(object):
             setattr(obj, field.name, self._generate_unique())
         else:
             setattr(obj, field.name, self._generate(obj, field.name))
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self, obj, field_name):
         qs = getattr(obj.__class__, field_name).field.related.parent_model.objects.all()

@@ -2,6 +2,7 @@ import random
 from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
 class M2MForm(forms.Form):
@@ -15,7 +16,7 @@ class M2MForm(forms.Form):
         return data
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Multiple random objects from queryset'
     slug = 'multiple-random-objects'
     for_fields = [models.ManyToManyField]
@@ -28,10 +29,6 @@ class Generator(object):
         for x in xrange(objects_count):
             m2m_dict[field.name].append(self._generate(obj, field.name))
         setattr(obj, '_m2m', m2m_dict)
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self, obj, field_name):
         qs = getattr(obj.__class__, field_name).field.related.parent_model.objects.all()

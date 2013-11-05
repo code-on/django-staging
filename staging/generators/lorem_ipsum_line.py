@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
 from django.contrib.webdesign import lorem_ipsum
+from staging.generators import BaseGenerator
 
 
 class LoremIpsumForm(forms.Form):
@@ -17,22 +18,20 @@ class LoremIpsumForm(forms.Form):
         return data
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Lorem ipsum line'
     slug = 'lorem-ipsum-line'
     for_fields = [models.CharField]
     options_form = LoremIpsumForm
-    generated = []
+
+    def __init__(self):
+        self.generated = []
 
     def save(self, obj, field, form_data):
         if field.unique:
             setattr(obj, field.name, self._generate_unique(form_data.get('min_words', 1), form_data.get('max_words', 1), form_data.get('capitalize_first_character', False)))
         else:
             setattr(obj, field.name, self._generate(form_data.get('min_words', 1), form_data.get('max_words', 1), form_data.get('capitalize_first_character', False)))
-
-    @classmethod
-    def is_available(cls, field):
-        return True
 
     def _generate(self, min_words, max_words, capitalize_first_character):
         words_count = random.randint(min_words, max_words)

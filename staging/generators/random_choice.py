@@ -1,20 +1,23 @@
 import random
 from django.db import models
 from django import forms
+from staging.generators import BaseGenerator
 
 
 class NotInitialized():
     pass
 
 
-class Generator(object):
+class Generator(BaseGenerator):
     name = 'Random choice'
     slug = 'random-choice'
     for_fields = [models.BigIntegerField, models.CharField, models.DecimalField, models.EmailField, models.FloatField,
                   models.IntegerField, models.IPAddressField, models.GenericIPAddressField, models.PositiveIntegerField,
                   models.PositiveSmallIntegerField, models.SmallIntegerField, models.URLField]
     options_form = None
-    choices_left = NotInitialized
+
+    def __init__(self):
+        self.choices_left = NotInitialized
 
     def save(self, obj, field, form_data):
         if field.unique:

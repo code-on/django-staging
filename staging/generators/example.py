@@ -2,6 +2,7 @@ import random
 from django.db import models
 from django import forms
 from django.db.models.fields import NOT_PROVIDED
+from staging.generators import BaseGenerator
 
 
 class ExampleForm(forms.Form):
@@ -11,7 +12,7 @@ class ExampleForm(forms.Form):
 
 # Valid generator file should contain declaration of Generator object with this parameters
 
-class Generator(object):
+class Generator(BaseGenerator):
     """
     In order to use your generator, please add it to GENERATORS tuple in __init__.py of generators package.
     This example generator will return unique number in the chosen range
@@ -29,19 +30,17 @@ class Generator(object):
     # form for extra parameters, can be None
     options_form = ExampleForm
 
-    # method executed for obj instance
     # field will contain django.db.models.fields.CharField instance in this example
     # form_data will contain cleaned_data from form specified in options_form
     def save(self, obj, field, form_data):
         setattr(obj, field.name, self._generate(form_data.get('min_words'), form_data.get('max_words')))
 
-    # method executed for each model field in "for_fields" to check if this generator supports such field
-    # e.g. we check there that default value for the field is not specified
+    # we check there that default value for the field is not specified
     @classmethod
     def is_available(cls, field):
         return field.default == NOT_PROVIDED
 
-    # helper function. It's not required.
+    # helper function.
     def _generate(self, min_words, max_words):
         words = random.randint(min_words, max_words)
         return ', '.join('example' for _ in range(words))
