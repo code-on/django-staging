@@ -1,6 +1,10 @@
 {% extends "admin/base_custom.html" %}
-{% load i18n staging_tags %}
+{% load i18n staging_tags staticfiles %}
 
+
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/generator.css" %}" />
+{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -12,27 +16,38 @@
 
 {% block content %}
   <div id="content-main">
-    <form action="" method="post">
+    <form action="" method="post" class="generator-form">
         {% csrf_token %}
         <fieldset style="padding: 10px;">
             {{ main_form.non_field_errors }}
             <table>
-                <tr>
-                    <td>{{ main_form.number_to_generate.label }}</td>
-                    <td>{{ main_form.number_to_generate }}</td>
-                </tr>
-                {% for field in main_form %}
-                    {% ifnotequal field.name 'number_to_generate' %}
-                        <tr class="main_field" data-name="{{ field.name }}">
-                            <td>{{ field.label }}</td>
-                            <td>{{ field }}</td>
-                        </tr>
-                        {% if extra_forms|get_form_for_field:field.name %}
-                            {{ extra_forms|get_form_for_field:field.name }}
-                        {% endif %}
-                    {% endifnotequal %}
-                {% endfor %}
+                <tbody>
+                    <tr>
+                        <th>{{ main_form.number_to_generate.label }}</th>
+                        <td>{{ main_form.number_to_generate }}</td>
+                    </tr>
+                </tbody>
             </table>
+            {% for field in main_form %}
+                {% ifnotequal field.name 'number_to_generate' %}
+                    <div class="module">
+                    <table class="bordered">
+                        <caption>
+                            {{ field.name|capfirst }}
+                        </caption>
+                        <tbody>
+                            <tr class="main-field" data-name="{{ field.name }}">
+                                <th scope="row">{% trans "Generator" %}</th>
+                                <td>{{ field }}</td>
+                            </tr>
+                            {% if extra_forms|get_form_for_field:field.name %}
+                                {{ extra_forms|get_form_for_field:field.name }}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    </div>
+                {% endifnotequal %}
+            {% endfor %}
         </fieldset>
         <button type="submit">{% trans "Generate" %}</button>
     </form>
@@ -41,8 +56,8 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script type="text/javascript">
         $(function(){
-            $('.main_field select').change(function(){
-                var main_field = $(this).closest('.main_field');
+            $('.main-field select').change(function(){
+                var main_field = $(this).closest('.main-field');
                 var field_name = $(this).prop('name');
                 var generator_slug = $(this).val();
                 $.ajax({
@@ -50,7 +65,7 @@
                     type: 'GET',
                     success: function(data){
                         main_field.nextAll().each(function(count, element){
-                            if ($(element).hasClass('main_field')) {
+                            if ($(element).hasClass('main-field')) {
                                 return false;
                             }
 
