@@ -1,8 +1,7 @@
 import traceback
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from generators import GENERATORS
-from staging.utils import get_generator_instance
+from staging.utils import get_generator_instance, get_available_generators
 
 
 class GeneratorForm(forms.Form):
@@ -15,7 +14,7 @@ class GeneratorForm(forms.Form):
             self.model = None
         super(GeneratorForm, self).__init__(*args, **kwargs)
 
-        generators_by_field = self._get_available_generators()
+        generators_by_field = get_available_generators()
         if self.model:
             fields_list = list(self.model._meta.fields)
             fields_list.extend(list(self.model._meta.many_to_many))
@@ -70,19 +69,6 @@ class GeneratorForm(forms.Form):
             return len(objects), False
         except:
             return traceback.format_exc(), True
-
-    def _get_available_generators(self):
-        """
-        Returns dict with lists of all available generators for each model field.
-        """
-        generators = {}
-        for generator_name in GENERATORS:
-            generator = getattr(getattr(getattr(__import__('staging.generators.%s' % generator_name, 'Generator'), 'generators'), generator_name), 'Generator')
-            for field in generator.for_fields:
-                if field not in generators:
-                    generators[field] = []
-                generators[field].append(generator)
-        return generators
 
     def get_chosen_generators(self):
         """

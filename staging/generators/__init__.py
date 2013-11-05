@@ -1,24 +1,8 @@
 
 
-GENERATORS = (
-    'default_value',
-    'lorem_ipsum_line',
-    'lorem_ipsum_paragraph',
-    'multiple_random_objects',
-    'random_choice',
-    'random_email',
-    'random_image',
-    'random_number',
-    'random_object',
-    'random_uuid',
-    'value_from_list',
-)
-
-
 class BaseGenerator(object):
     """
-    In order to create your own generator, please subclass this base class implementing all methods
-    and add it to GENERATORS tuple above.
+    In order to create your own generator, please subclass this base class implementing "save" method
     """
 
     # displayed name

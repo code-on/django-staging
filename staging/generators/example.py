@@ -19,7 +19,6 @@ class NotInitialized():
 
 class Generator(BaseGenerator):
     """
-    In order to use your generator, please add it to GENERATORS tuple in __init__.py of generators package.
     This example generator will return unique number in the chosen range
     """
 
@@ -29,8 +28,8 @@ class Generator(BaseGenerator):
     # slug should be unique for each generator
     slug = 'example-generator'
 
-    # field types for which it will be displayed
-    for_fields = [models.IntegerField, models.DecimalField]
+    # field types for which it will be displayed (commented out so this generator is not automatically loaded each time)
+    # for_fields = [models.IntegerField, models.DecimalField]
 
     # form for extra parameters, can be None
     options_form = ExampleForm

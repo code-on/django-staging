@@ -1,4 +1,30 @@
-from staging.generators import GENERATORS
+import os
+import imp
+from django.conf import settings
+
+
+
+GENERATORS_CACHE_BY_SLUG = {}
+GENERATORS_CACHE_BY_FIELD = {}
+
+
+def init_generators():
+    for directory in settings.GENERATORS_DIRS:
+        if os.path.isdir(directory):
+            for file_name in os.listdir(directory):
+                try:
+                    generator_module = imp.load_source('staging.generators.%s' % file_name, os.path.join(directory, file_name))
+                    generator_class = generator_module.Generator
+                    GENERATORS_CACHE_BY_SLUG[generator_class.slug] = generator_class
+                    for field in generator_class.for_fields:
+                        if field not in GENERATORS_CACHE_BY_FIELD:
+                            GENERATORS_CACHE_BY_FIELD[field] = []
+                        GENERATORS_CACHE_BY_FIELD[field].append(generator_class)
+                except:
+                    pass
+
+
+init_generators()
 
 
 def get_options_form(generator, field_name, data=None):
@@ -13,7 +39,13 @@ def get_generator_instance(slug):
     """
     Returns generator instance by specified slug.
     """
-    for generator_name in GENERATORS:
-        generator = getattr(getattr(getattr(__import__('staging.generators.%s' % generator_name, 'Generator'), 'generators'), generator_name), 'Generator')
-        if generator.slug == slug:
-            return generator()
+    generator_class = GENERATORS_CACHE_BY_SLUG.get(slug)
+    if generator_class:
+        return generator_class()
+
+
+def get_available_generators():
+    """
+    Returns dict with lists of all available generators for each model field.
+    """
+    return GENERATORS_CACHE_BY_FIELD

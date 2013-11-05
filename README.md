@@ -50,4 +50,8 @@ Examples are below:
 
 ![Example2](https://github.com/code-on/django-staging/raw/master/examples/example2.png)
 
-You can add your own generators. More details on this in staging/generators/example.py.
+You can add your own generators. More details on generator attributes/methods in staging/generators/example.py. Generators are automatically loaded on start from this locations:
+
+- generators directory in staging application
+- path specified in `GENERATORS_DIR` environmental variable
+- path specified with `--generators-dir` option for `staging_generator` command
