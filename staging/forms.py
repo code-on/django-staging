@@ -1,3 +1,4 @@
+import traceback
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from generators import GENERATORS
@@ -67,8 +68,8 @@ class GeneratorForm(forms.Form):
                     for item in value:
                         getattr(object_, key).add(item)
             return len(objects), False
-        except Exception, e:
-            return e.message, True
+        except:
+            return traceback.format_exc(), True
 
     def _get_available_generators(self):
         """
