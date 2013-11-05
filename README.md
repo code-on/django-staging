@@ -50,4 +50,4 @@ Examples are below:
 
 ![Example2](https://github.com/code-on/django-staging/raw/master/examples/example2.png)
 
-You can add your own generators. More details on this in generators/example.py.
+You can add your own generators. More details on this in staging/generators/example.py.
