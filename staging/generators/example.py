@@ -10,7 +10,12 @@ class ExampleForm(forms.Form):
     max_number = forms.IntegerField()
 
 
+class NotInitialized():
+    pass
+
+
 # Valid generator file should contain declaration of Generator object with this parameters
+
 
 class Generator(BaseGenerator):
     """
@@ -25,22 +30,30 @@ class Generator(BaseGenerator):
     slug = 'example-generator'
 
     # field types for which it will be displayed
-    for_fields = [models.CharField]
+    for_fields = [models.IntegerField, models.DecimalField]
 
     # form for extra parameters, can be None
     options_form = ExampleForm
 
-    # field will contain django.db.models.fields.CharField instance in this example
-    # form_data will contain cleaned_data from form specified in options_form
-    def save(self, obj, field, form_data):
-        setattr(obj, field.name, self._generate(form_data.get('min_words'), form_data.get('max_words')))
+    def __init__(self):
+        self.numbers_left = NotInitialized
 
-    # we check there that default value for the field is not specified
+    # field will contain django.db.models.fields.IntegerField or django.db.models.fields.DecimalField instance
+    # form_data will contain cleaned_data from the form specified in options_form
+    def save(self, obj, field, form_data):
+        if self.numbers_left == NotInitialized:
+            self.numbers_left = range(form_data.get('min_number', 1), form_data.get('max_number', 1))
+        setattr(obj, field.name, self._generate())
+
+    # conditions for field to have this generator
+    # for example we check there that default value for the field is not specified
     @classmethod
     def is_available(cls, field):
         return field.default == NOT_PROVIDED
 
-    # helper function.
-    def _generate(self, min_words, max_words):
-        words = random.randint(min_words, max_words)
-        return ', '.join('example' for _ in range(words))
+    # helper function
+    def _generate(self):
+        if self.numbers_left:
+            value = random.choice(self.numbers_left)
+            self.numbers_left = [x for x in self.numbers_left if x != value]
+            return value

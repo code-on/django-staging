@@ -49,3 +49,5 @@ Examples are below:
 ![Example1](https://github.com/code-on/django-staging/raw/master/examples/example1.png)
 
 ![Example2](https://github.com/code-on/django-staging/raw/master/examples/example2.png)
+
+You can add your own generators. More details on this in generators/example.py.
