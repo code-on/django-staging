@@ -9,6 +9,7 @@ from staging.generators import BaseGenerator
 class LoremIpsumForm(forms.Form):
     min_paragraphs = forms.IntegerField()
     max_paragraphs = forms.IntegerField()
+    html = forms.BooleanField()
 
     def clean(self):
         data = super(LoremIpsumForm, self).clean()
@@ -28,18 +29,20 @@ class Generator(BaseGenerator):
 
     def save(self, obj, field, form_data):
         if field.unique:
-            setattr(obj, field.name, self._generate_unique(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1)))
+            setattr(obj, field.name, self._generate_unique(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1), form_data.get('html', False)))
         else:
-            setattr(obj, field.name, self._generate(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1)))
+            setattr(obj, field.name, self._generate(form_data.get('min_paragraphs', 1), form_data.get('max_paragraphs', 1), form_data.get('html', False)))
 
-    def _generate(self, min_paragraphs, max_paragraphs):
+    def _generate(self, min_paragraphs, max_paragraphs, html):
         paragraphs_count = random.randint(min_paragraphs, max_paragraphs)
-        return '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count, common=False))
+        paragraphs = lorem_ipsum.paragraphs(paragraphs_count, common=False)
+        if html:
+            paragraphs = ['<p>%s</p>' % x for x in paragraphs]
+        return '\n\n'.join(paragraphs)
 
-    def _generate_unique(self, min_paragraphs, max_paragraphs):
+    def _generate_unique(self, min_paragraphs, max_paragraphs, html):
         for _ in range(10000):
-            paragraphs_count = random.randint(min_paragraphs, max_paragraphs)
-            value = '\n\n'.join(lorem_ipsum.paragraphs(paragraphs_count, common=False))
+            value = self._generate(min_paragraphs, max_paragraphs, html)
             if value not in self.generated:
                 self.generated.append(value)
                 return value

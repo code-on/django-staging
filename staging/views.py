@@ -8,6 +8,7 @@ from staging.forms import GeneratorForm
 from staging.utils import get_options_form, get_generator_instance
 
 
+@user_passes_test()
 def data_generator(request, _module, _class):
     model = get_model(_module, _class)
 

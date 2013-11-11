@@ -1,3 +1,4 @@
+import os
 
 
 class BaseGenerator(object):
@@ -26,3 +27,7 @@ class BaseGenerator(object):
     @classmethod
     def is_available(cls, field):
         return True
+
+    # used to get full path for files relative to generator
+    def rel_path(self, *path):
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), *path)

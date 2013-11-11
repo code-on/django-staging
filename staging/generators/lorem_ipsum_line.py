@@ -42,10 +42,7 @@ class Generator(BaseGenerator):
 
     def _generate_unique(self, min_words, max_words, capitalize_first_character):
         for _ in range(10000):
-            words_count = random.randint(min_words, max_words)
-            value = '\n\n'.join(lorem_ipsum.words(words_count, common=False))
-            if capitalize_first_character:
-                value = '%s%s' % (value[0].upper(), value[1:])
+            value = self._generate(min_words, max_words, capitalize_first_character)
             if value not in self.generated:
                 self.generated.append(value)
                 return value
