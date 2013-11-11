@@ -3,6 +3,7 @@
 
 
 {% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/generator.css" %}" />
 {% endblock %}
 
@@ -53,28 +54,36 @@
     </form>
   </div>
 
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/jquery.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/actions.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/calendar.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/admin/DateTimeShortcutsCustom.js' %}"></script>
   <script type="text/javascript">
-        $(function(){
-            $('.main-field select').change(function(){
-                var main_field = $(this).closest('.main-field');
-                var field_name = $(this).prop('name');
-                var generator_slug = $(this).val();
-                $.ajax({
+        django.jQuery(function(){
+            django.jQuery('.main-field select').change(function(){
+                var main_field = django.jQuery(this).closest('.main-field');
+                var field_name = django.jQuery(this).attr('name');
+                var generator_slug = django.jQuery(this).val();
+                django.jQuery.ajax({
                     url: '/admin/ajax/generate/' + field_name + '/' + generator_slug + '/',
                     type: 'GET',
                     success: function(data){
                         main_field.nextAll().each(function(count, element){
-                            if ($(element).hasClass('main-field')) {
+                            if (django.jQuery(element).hasClass('main-field')) {
                                 return false;
                             }
 
-                            $(element).remove();
+                            django.jQuery(element).remove();
                         });
                         main_field.after(data);
+                        DateTimeShortcuts.init();
                     }
                 });
             });
         })
-    </script>
+  </script>
 {% endblock %}
