@@ -33,9 +33,6 @@ class Generator(BaseGenerator):
                 self.generated.append(value)
                 return value
 
-    def _get_name(self, length):
-        return ''.join(random.choice(ascii_lowercase) for x in xrange(length))
-
     def _get_domains(self):
         with open(self.rel_path('_email_domains.txt'), 'r') as f:
             return f.read().split()

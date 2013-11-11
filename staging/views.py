@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import get_model
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -8,7 +9,7 @@ from staging.forms import GeneratorForm
 from staging.utils import get_options_form, get_generator_instance
 
 
-@user_passes_test()
+@staff_member_required
 def data_generator(request, _module, _class):
     model = get_model(_module, _class)
 
