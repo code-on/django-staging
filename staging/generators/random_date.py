@@ -3,7 +3,6 @@ import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
-from django.forms import DateTimeInput
 from django.contrib.admin import widgets
 from staging.generators import BaseGenerator
 
