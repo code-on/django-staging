@@ -16,11 +16,10 @@ class Generator(BaseGenerator):
     name = 'Value from list'
     slug = 'value-from-list'
     for_fields = [models.BigIntegerField, models.BooleanField, models.CharField, models.DateField, models.DateTimeField,
-                  models.DecimalField, models.EmailField, models.FileField, models.FilePathField, models.FloatField,
-                  models.ImageField, models.IntegerField, models.IPAddressField, models.GenericIPAddressField,
-                  models.NullBooleanField, models.PositiveIntegerField, models.PositiveSmallIntegerField,
-                  models.SlugField, models.SmallIntegerField, models.TextField, models.TimeField, models.URLField,
-                  models.ForeignKey, models.OneToOneField]
+                  models.DecimalField, models.EmailField, models.FloatField, models.IntegerField, models.IPAddressField,
+                  models.GenericIPAddressField, models.NullBooleanField, models.PositiveIntegerField,
+                  models.PositiveSmallIntegerField, models.SlugField, models.SmallIntegerField, models.TextField,
+                  models.TimeField, models.URLField]
     options_form = ValueFromListForm
 
     def __init__(self):
