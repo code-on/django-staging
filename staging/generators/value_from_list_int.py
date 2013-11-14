@@ -14,10 +14,9 @@ class NotInitialized():
 
 class Generator(BaseGenerator):
     name = 'Value from list'
-    slug = 'value-from-list'
-    for_fields = [models.CharField, models.DateField, models.DateTimeField, models.EmailField, models.FloatField,
-                  models.IPAddressField, models.GenericIPAddressField, models.SlugField, models.TextField,
-                  models.TimeField, models.URLField]
+    slug = 'value-from-list-int'
+    for_fields = [models.BigIntegerField, models.DecimalField, models.IntegerField, models.PositiveIntegerField,
+                  models.PositiveSmallIntegerField, models.SmallIntegerField]
     options_form = ValueFromListForm
 
     def __init__(self):
@@ -33,10 +32,10 @@ class Generator(BaseGenerator):
 
     def _generate(self, text):
         lines = text.split('\n')
-        return random.choice(lines)
+        return int(random.choice(lines))
 
     def _generate_unique(self):
         if self.lines_left:
-            value = random.choice(self.lines_left)
+            value = int(random.choice(self.lines_left))
             self.lines_left = [x for x in self.lines_left if x != value]
             return value
