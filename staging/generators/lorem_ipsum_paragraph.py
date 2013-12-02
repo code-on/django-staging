@@ -9,7 +9,7 @@ from staging.generators import BaseGenerator
 class LoremIpsumForm(forms.Form):
     min_paragraphs = forms.IntegerField()
     max_paragraphs = forms.IntegerField()
-    html = forms.BooleanField()
+    html = forms.BooleanField(required=False)
 
     def clean(self):
         data = super(LoremIpsumForm, self).clean()
