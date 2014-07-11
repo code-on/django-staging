@@ -13,6 +13,8 @@ Add `'staging'` to your `INSTALLED_APPS` and this to `settings.py`:
         rel('fixtures'),
     )
 
+In order to use visual fixtures generation feature in Django1.7+, `'staging'` app should be placed before `'django.contrib.admin'` in `INSTALLED_APPS`.
+
 # Usage
 
 `save_staging` command saves data from your database to fixtures:
