@@ -3,13 +3,15 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db.models.loading import get_apps
 from optparse import make_option
+from staging.management.commands import StagingBaseCommand
 from staging.signals import on_load_staging
 import os
 import re
 
 
-class Command(BaseCommand):
-    requires_model_validation = True
+class Command(StagingBaseCommand):
+    do_system_checks = True
+
     help = (u'Load all fixtures with staging_ prefix. '
         u'If env is defined: fixtures with {{ env }}_staging_ will be loaded and the end, '
         u'so you can overwride some data.')

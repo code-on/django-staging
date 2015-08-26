@@ -6,13 +6,14 @@ from optparse import make_option
 import os
 import shutil
 import subprocess
+from staging.management.commands import StagingBaseCommand
 
 STAGING_MEDIA_PATH = getattr(settings, 'STAGING_MEDIA_PATH', 'staging')
 STAGING_MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT, STAGING_MEDIA_PATH)
 
 
-class Command(BaseCommand):
-    requires_model_validation = True
+class Command(StagingBaseCommand):
+    do_system_checks = True
     help = (u'This command saves data from DB to staging fixtures. '
             u'Example: \n./manage.py save_staging auth \n'
             u'./manage.py save_staging auth.User\n'
