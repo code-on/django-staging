@@ -1,18 +1,30 @@
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError
-from django.db.models import FileField, get_app, get_models, get_model
-from optparse import make_option
-import os
 import shutil
 import subprocess
+from optparse import make_option
+from django.core.exceptions import ImproperlyConfigured
+
+import os
+from django.conf import settings
+from django.core.management import BaseCommand, CommandError
+from django.db.models import FileField
+
+from staging.management.commands import StagingBaseCommand
 
 STAGING_MEDIA_PATH = getattr(settings, 'STAGING_MEDIA_PATH', 'staging')
 STAGING_MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT, STAGING_MEDIA_PATH)
 
+try:
+    from django.apps import apps  # Django => 1.9
+except ImportError:
+    from django.db.models import get_app, get_models, get_model
+else:
+    get_app = lambda app_label: apps.get_app_config(app_label)
+    get_model = lambda app_label, model_label: apps.get_app_config(app_label).get_model(model_label)
+    get_models = lambda app: app.models.values()
 
-class Command(BaseCommand):
-    requires_model_validation = True
+
+class Command(StagingBaseCommand):
+    do_system_checks = True
     help = (u'This command saves data from DB to staging fixtures. '
             u'Example: \n./manage.py save_staging auth \n'
             u'./manage.py save_staging auth.User\n'
@@ -34,11 +46,14 @@ class Command(BaseCommand):
         for app_label in app_labels:
             try:
                 app_label, model_label = app_label.split('.')
-                models = [get_model(app_label, model_label)]
+                try:
+                    models = [get_model(app_label, model_label)]
+                except LookupError, e:
+                    raise CommandError(e)
             except ValueError:
                 try:
                     app = get_app(app_label)
-                except ImproperlyConfigured, e:
+                except (ImproperlyConfigured, LookupError), e:
                     raise CommandError(e)
                 models = get_models(app)
 
@@ -49,7 +64,7 @@ class Command(BaseCommand):
             for model in models:
                 meta = model._meta
                 model_name = '%s.%s' % (meta.app_label, meta.object_name)
-                
+
                 if not model.objects.exists():
                     continue
 
@@ -96,3 +111,4 @@ class Command(BaseCommand):
 
                         setattr(obj, field.name, value)
                         obj.save()
+
