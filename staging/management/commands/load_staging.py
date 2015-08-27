@@ -1,12 +1,18 @@
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.db.models.loading import get_apps
 from optparse import make_option
 from staging.management.commands import StagingBaseCommand
 from staging.signals import on_load_staging
 import os
 import re
+
+try:
+    from django.apps import apps  # Django => 1.9
+except ImportError:
+    from django.db.models.loading import get_apps
+else:
+    get_apps = lambda: [a.module for a in apps.get_app_configs()]
 
 
 class Command(StagingBaseCommand):
