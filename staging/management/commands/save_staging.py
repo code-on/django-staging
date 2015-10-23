@@ -20,7 +20,7 @@ except ImportError:
 else:
     get_app = lambda app_label: apps.get_app_config(app_label)
     get_model = lambda app_label, model_label: apps.get_app_config(app_label).get_model(model_label)
-    get_models = lambda app: app.models.values()
+    get_models = lambda app: app.get_models()
 
 
 class Command(StagingBaseCommand):
