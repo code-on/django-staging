@@ -19,12 +19,12 @@ class Command(StagingBaseCommand):
     do_system_checks = True
 
     help = (u'Load all fixtures with staging_ prefix. '
-        u'If env is defined: fixtures with {{ env }}_staging_ will be loaded and the end, '
-        u'so you can overwride some data.')
+            u'If env is defined: fixtures with {{ env }}_staging_ will be loaded and the end, '
+            u'so you can overwride some data.')
 
     option_list = BaseCommand.option_list + (
         make_option('--env', '-e', dest='env',
-            help='enviroment'),
+                    help='enviroment'),
     )
 
     def handle(self, *args, **kwargs):
@@ -45,7 +45,7 @@ class Command(StagingBaseCommand):
                 # It's a models.py module
                 app_module_paths.append(app.__file__)
 
-        app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
+        app_fixtures = [os.path.join(path, 'fixtures') for path in app_module_paths]
         app_fixtures += settings.FIXTURE_DIRS
 
         fixtures = []
