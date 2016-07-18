@@ -22,7 +22,7 @@ class Command(StagingBaseCommand):
                     continue
             db_file = settings.DATABASES[db_key]['NAME']
             if os.path.exists(db_file):
-                if not 'nodelete' in args:
+                if 'nodelete' not in args:
                     os.unlink(db_file)
 
             kwargs = dict(database=db_key, interactive=False)
