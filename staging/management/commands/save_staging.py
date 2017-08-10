@@ -74,7 +74,7 @@ class Command(StagingBaseCommand):
                                                              meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
-                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--indent=2'],
+                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--natural-foreign', '--indent=2'],
                                 stdout=open(fixtures_path, 'w'))
 
     def move_files(self, model):
