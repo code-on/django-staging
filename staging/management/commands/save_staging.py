@@ -1,67 +1,49 @@
-import shutil
-import subprocess
-from optparse import make_option
-from django.core.exceptions import ImproperlyConfigured
-
-import os
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError
 from django.db.models import FileField
-
-from staging.management.commands import StagingBaseCommand
+from django.apps import apps as django_apps
+from optparse import make_option
+import os
+import shutil
+import subprocess
 
 STAGING_MEDIA_PATH = getattr(settings, 'STAGING_MEDIA_PATH', 'staging')
 STAGING_MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT, STAGING_MEDIA_PATH)
 
-try:
-    from django.apps import apps  # Django => 1.9
-except ImportError:
-    from django.db.models import get_app, get_models, get_model
-else:
-    get_app = lambda app_label: apps.get_app_config(app_label)
-    get_model = lambda app_label, model_label: apps.get_app_config(app_label).get_model(model_label)
-    get_models = lambda app: app.get_models()
 
-
-class Command(StagingBaseCommand):
-    do_system_checks = True
+class Command(BaseCommand):
     help = (u'This command saves data from DB to staging fixtures. '
             u'Example: \n./manage.py save_staging auth \n'
-            u'./manage.py save_staging auth.User\n'
-            u'Add --env to save fixtures for some enviroment')
+            u'./manage.py save_staging auth.User\n')
 
-    option_list = BaseCommand.option_list + (
-        make_option('--env', '-e', dest='env', help='enviroment'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('app_labels', nargs='+')
 
-    def handle(self, *app_labels, **options):
+    def handle(self, *args, **options):
         if not settings.FIXTURE_DIRS:
             raise CommandError('Add fixtures folder for project root to FIXTURE_DIRS for saving apps not from project')
 
-        if options.get('env'):
-            env_prefix = options.get('env') + '_'
-        else:
-            env_prefix = ''
+        env_prefix = '' # some legacy
+        app_labels = options['app_labels']
 
         for app_label in app_labels:
             try:
                 app_label, model_label = app_label.split('.')
-                try:
-                    models = [get_model(app_label, model_label)]
-                except LookupError, e:
-                    raise CommandError(e)
+                models = [django_apps.get_model(app_label, model_label)]
             except ValueError:
                 try:
-                    app = get_app(app_label)
-                except (ImproperlyConfigured, LookupError), e:
+                    app = django_apps.get_app_config(app_label)
+                except ImproperlyConfigured, e:
                     raise CommandError(e)
-                models = get_models(app)
+                models = app.get_models()
 
             fixtures_dir = settings.FIXTURE_DIRS[0]
             if not os.path.exists(fixtures_dir):
                 os.makedirs(fixtures_dir)
 
             for model in models:
+                print 'processing model', model
                 meta = model._meta
                 model_name = '%s.%s' % (meta.app_label, meta.object_name)
 
@@ -74,7 +56,7 @@ class Command(StagingBaseCommand):
                                                              meta.object_name.lower())
                 self.move_files(model)
                 print 'saving %s' % model_name
-                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--natural-foreign', '--indent=2'],
+                subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--natural-foreign', '--indent=1'],
                                 stdout=open(fixtures_path, 'w'))
 
     def move_files(self, model):
@@ -111,4 +93,3 @@ class Command(StagingBaseCommand):
 
                         setattr(obj, field.name, value)
                         obj.save()
-
