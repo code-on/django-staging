@@ -34,7 +34,7 @@ class Command(BaseCommand):
             except ValueError:
                 try:
                     app = django_apps.get_app_config(app_label)
-                except ImproperlyConfigured, e:
+                except ImproperlyConfigured as e:
                     raise CommandError(e)
                 models = app.get_models()
 
@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 os.makedirs(fixtures_dir)
 
             for model in models:
-                print 'processing model', model
+                print ('processing model', model)
                 meta = model._meta
                 model_name = '%s.%s' % (meta.app_label, meta.object_name)
 
@@ -55,7 +55,7 @@ class Command(BaseCommand):
                                                              meta.app_label.lower(),
                                                              meta.object_name.lower())
                 self.move_files(model)
-                print 'saving %s' % model_name
+                print ('saving %s' % model_name)
                 subprocess.call(['python', 'manage.py', 'dumpdata', model_name, '--natural-foreign', '--indent=1'],
                                 stdout=open(fixtures_path, 'w'))
 
