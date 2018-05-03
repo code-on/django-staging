@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         if settings.DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
-            if raw_input('Database engine is not SQLite. Do you wish load staging data? [y/N]') != 'y':
+            if input('Database engine is not SQLite. Do you wish load staging data? [y/N]') != 'y':
                 return
 
         options = kwargs.get('options', {})
